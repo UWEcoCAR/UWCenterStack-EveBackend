@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Maps Example</title>
+    <link rel="stylesheet" type="text/css" href="../style/main.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script type="text/javascript" src="../scripts/main.js"></script>
+  </head>
+  <body>
+    <div id="map">
+    </div>
+    <div id="controls">
+      <div class="controlsPanel">
+        <b>Start:</b>
+        <select id="start">
+          <option value="Denver, CO">Denver</input>
+          <option value="Los Angeles, CA">LA</input>
+        </select>
+        <br />
+        <b>Waypoints:</b>
+        <br />
+        <select multiple id="waypoints">
+          <option value="portland, or">Portland, OR</input>
+          <option value="spokane, wa">Spokane</input>
+        </select>
+        <br />
+        <b>End:</b>
+        <select id="end">
+          <option value="Vancouver, BC">Vancouver, BC</option>
+          <option value="Seattle, WA">Seattle, WA</option>
+          <option value="San Francisco, CA">San Francisco, CA</option>
+          <option value="Los Angeles, CA">Los Angeles, CA</option>
+        </select>
+        <br />
+        <input type="submit" onclick="calcRoute();">
+      </div>
+      <div id="directions">
+      </div>
+    </div>
+  </body>
+</html>
