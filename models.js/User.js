@@ -10,8 +10,8 @@ var userSchema = mongoose.Schema({
     distance: Number,
     MPGe: Number,
     cost: Number,
-    dieselEnergy, Number,
-    electricEnergy, Number
+    dieselEnergy: Number,
+    electricEnergy: Number
 });
 
 // define custom methods
