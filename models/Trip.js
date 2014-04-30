@@ -4,14 +4,13 @@ var mongoose = require('mongoose'),
 // create trip schema
 var tripSchema = mongoose.Schema({
     userId: mongoose.Schema.Types.ObjectId,
-    _id: mongoose.Schema.Types.ObjectId, 
     startLocation: {
         time: {type: Date, default: Date.now},
-        location: {lat: Number, long: Number},
+        location: {lat: Number, long: Number}
     },
     endLocation: {
         time: Date,
-        location: {lat: Number, long: Number},
+        location: {lat: Number, long: Number}
     },
     MPGe: Number,
     distance: Number,

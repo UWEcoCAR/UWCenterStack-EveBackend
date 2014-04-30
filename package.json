@@ -1,0 +1,14 @@
+{
+  "name": "uwcenterstack-evebackend",
+  "version": "1.0.1",
+  "main": "./EveBackend.js",
+  "repository" : {
+      "type" : "git",
+      "url" : "http://github.com/UWEcoCAR2/UWCenterStack-EveBackend.git"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "underscore": "~1.6.0",
+    "mongoose": "~3.8.8"
+  }
+}

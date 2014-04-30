@@ -1,7 +1,6 @@
 var mongoose = require('mongoose');
 
 var dataPointSchema = mongoose.Schema({
-    _id: mongoose.Schema.Types.ObjectId,
     tripId: mongoose.Schema.Types.ObjectId, 
     location: {lat: Number, long: Number},
     fuelConsumption: Number,
@@ -9,12 +8,12 @@ var dataPointSchema = mongoose.Schema({
     optimalPosition: Number,
     speed: Number,
     acceleration: Number,
-    engineTRQ: Number,
-    engineRPM: Number,
-    motorTRQ: Number,
-    motorRPM: Number,
+    engineTrq: Number,
+    engineRpm: Number,
+    motorTrq: Number,
+    motorTpm: Number,
     batterySoc: {type: Number, min: 0, max: 100},
-    batteryVolatage: Number,
+    batteryVoltage: Number,
     batteryCurrent: Number,
     fuel: {type: Number, min: 0, max: 100},
     engineTemp: Number,
