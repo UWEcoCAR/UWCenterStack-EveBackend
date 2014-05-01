@@ -52,21 +52,113 @@ function calcRoute() {
   });
 }
 
+
+var data = [
+  {
+   location: { // eco car lab
+     lat: 47.654109,
+     long: -122.304331
+   },
+   efficiency: 10
+  },
+  {
+   location: {
+     lat: 47.654127,
+     long: -122.305130
+   },
+   efficiency: 10
+ },
+ {
+   location: {
+     lat: 47.654961,
+     long: -122.304653
+   },
+   efficiency: 10
+ },
+ {
+   location: {
+     lat: 47.654940,
+     long: -122.304642
+   },
+   efficiency: 10
+ },
+ {
+   location: {
+     lat: 47.655821,
+     long: -122.304556
+   },
+   efficiency: 10
+ },
+ {
+   location: {
+     lat: 47.656812,
+     long: -122.304814
+   },
+   efficiency: 10
+ },
+ {
+   location: {
+     lat: 47.657830,
+     long: -122.304578
+   },
+   efficiency: 10
+ },
+ {
+   location: {
+     lat: 47.658437,
+     long: -122.305543
+   },
+   efficiency: 10
+ },
+ {
+   location: {
+     lat: 47.659044,
+     long: -122.306445
+   },
+   efficiency: 10
+ },
+ {
+   location: {
+     lat: 47.659558,
+     long: -122.307249
+   },
+   efficiency: 10
+ },
+ {
+   location: {
+     lat: 47.659767,
+     long: -122.308376
+   },
+   efficiency: 10
+ },
+ {
+   location: {
+     lat: 47.659717,
+     long: -122.309288
+   },
+   efficiency: 10
+ }];
+
+
 function addEfficiency() {
-  var routeCoordinates = [
-    new google.maps.LatLng(47.654109, -122.304331), // eco car lab
-    new google.maps.LatLng(47.654127, -122.305130),
-    new google.maps.LatLng(47.654961, -122.304653),
-    new google.maps.LatLng(47.654940, -122.304642),
-    new google.maps.LatLng(47.655821, -122.304556),
-    new google.maps.LatLng(47.656812, -122.304814),
-    new google.maps.LatLng(47.657830, -122.304578),
-    new google.maps.LatLng(47.658437, -122.305543),
-    new google.maps.LatLng(47.659044, -122.306445),
-    new google.maps.LatLng(47.659558, -122.307249),
-    new google.maps.LatLng(47.659767, -122.308376),
-    new google.maps.LatLng(47.659717, -122.309288) // stevens and 17th
-  ];
+  // var routeCoordinates = [
+  //   new google.maps.LatLng(47.654109, -122.304331), // eco car lab
+  //   new google.maps.LatLng(47.654127, -122.305130),
+  //   new google.maps.LatLng(47.654961, -122.304653),
+  //   new google.maps.LatLng(47.654940, -122.304642),
+  //   new google.maps.LatLng(47.655821, -122.304556),
+  //   new google.maps.LatLng(47.656812, -122.304814),
+  //   new google.maps.LatLng(47.657830, -122.304578),
+  //   new google.maps.LatLng(47.658437, -122.305543),
+  //   new google.maps.LatLng(47.659044, -122.306445),
+  //   new google.maps.LatLng(47.659558, -122.307249),
+  //   new google.maps.LatLng(47.659767, -122.308376),
+  //   new google.maps.LatLng(47.659717, -122.309288) // stevens and 17th
+  // ];
+  var routeCoordinates = [];
+  for (var i = 0; i < data.length; i++) {
+    routeCoordinates.push(new google.maps.LatLng(data[i].location.lat, data[i].location.long));
+  }
 
   var to45th = [
     new google.maps.LatLng(47.659717, -122.309288), // stevens and 17th
@@ -112,7 +204,7 @@ function addEfficiency() {
   var firstPath = new google.maps.Polyline({
     path: routeCoordinates,
     geodesic: true,
-    strokeColor: '#FF0000',
+    strokeColor: calculateColor(data, 0, data.length),
     strokeOpacity: 1.0,
     strokeWeight: 3
   });
@@ -155,4 +247,24 @@ function addEfficiency() {
   summaryPanel.innerHTML = '';
   summaryPanel.innerHTML += '<b>Driving around campus</b><br>';
   summaryPanel.innerHTML += 'Starting at the EcoCAR lab and heading North!<br />';
+}
+
+function calculateColor(data, low, high) {
+  var avg = 0;
+  for (var i = low; i < high; i++) {
+    avg += data[i].efficiency;
+    console.log("data pt", data[i]);
+  }
+  avg = avg/(high - low);
+  console.log("average", avg);
+
+  if (avg < 10) {
+    return "#000000";
+  } else if (avg < 15) {
+    return "#FF0000";
+  } else if (avg < 20) {
+    return "#00FF00";
+  } else {
+    return "#0000FF";
+  }
 }
