@@ -4,9 +4,9 @@ var mongoose = require('mongoose'),
 
 // create user schema
 var userSchema = mongoose.Schema({
-    _id: mongoose.Schema.Types.ObjectId, 
+    _id: mongoose.Schema.Types.ObjectId,
     firstName: {type:String, default: ""},
-    lastName: {type:String, default: ""}.
+    lastName: {type:String, default: ""},
     distance: Number,
     MPGe: Number,
     cost: Number,
