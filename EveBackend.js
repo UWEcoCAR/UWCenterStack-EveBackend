@@ -17,16 +17,17 @@ module.exports.CanLogger = function(canReadWriter) {
                 },
                 pedalPosition: canReadWriter.getMail('vehicleAccel'),
                 speed: canReadWriter.getMail('vehicleSpeed'),
-                engineTrq: canReadWriter.getMail('engineTrq'),
+                engineTrq: canReadWriter.getMail('engineTorque'),
                 engineRpm: canReadWriter.getMail('engineRpm'),
                 engineTemp: canReadWriter.getMail('engineTemp'),
-                motorTrq: canReadWriter.getMail('motorTrq'),
+                motorTrq: canReadWriter.getMail('motorTorque'),
                 motorRpm: canReadWriter.getMail('motorRpm'),
                 motorTemp: canReadWriter.getMail('motorTemp'),
                 batterySoc: canReadWriter.getMail('batterySoc'),
                 batteryVoltage: canReadWriter.getMail('batteryVoltage'),
                 batteryCurrent: canReadWriter.getMail('batteryCurrent'),
-                batteryTemp: canReadWriter.getMail('batteryTemp')
+                batteryTemp: canReadWriter.getMail('batteryTemp'),
+                fuelConsumption: canReadWriter.getMail('fuelConsumption')
             }, function(err) {
                 err && console.log(err);
             });
