@@ -1,16 +1,17 @@
 var mongoose = require('mongoose'),
     Trip = require('./Trip.js'),
     DataPoint = require('./DataPoint.js');
+require('mongoose-double')(mongoose);
 
 // create user schema
 var userSchema = mongoose.Schema({
     firstName: {type:String, default: ""},
     lastName: {type:String, default: ""},
-    distance: Number,
-    MPGe: Number,
-    cost: Number,
-    dieselEnergy: Number,
-    electricEnergy: Number
+    distance: mongoose.Schema.Types.Double,
+    MPGe: mongoose.Schema.Types.Double,
+    cost: mongoose.Schema.Types.Double,
+    dieselEnergy: mongoose.Schema.Types.Double,
+    electricEnergy: mongoose.Schema.Types.Double
 });
 
 // define custom methods

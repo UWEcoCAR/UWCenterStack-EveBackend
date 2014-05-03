@@ -1,23 +1,24 @@
 var mongoose = require('mongoose'),
     DataPoint = require('./DataPoint.js');
+require('mongoose-double')(mongoose);
 
 // create trip schema
 var tripSchema = mongoose.Schema({
     userId: mongoose.Schema.Types.ObjectId,
     startLocation: {
         time: {type: Date, default: Date.now},
-        location: {lat: Number, long: Number}
+        location: {lat: mongoose.Schema.Types.Double, long: mongoose.Schema.Types.Double}
     },
     endLocation: {
         time: Date,
-        location: {lat: Number, long: Number}
+        location: {lat: mongoose.Schema.Types.Double, long: mongoose.Schema.Types.Double}
     },
-    MPGe: Number,
-    distance: Number,
-    cost: Number,
-    speed: Number,
-    dieselEnergy: Number,
-    electricEnergy: Number
+    MPGe: mongoose.Schema.Types.Double,
+    distance: mongoose.Schema.Types.Double,
+    cost: mongoose.Schema.Types.Double,
+    speed: mongoose.Schema.Types.Double,
+    dieselEnergy: mongoose.Schema.Types.Double,
+    electricEnergy: mongoose.Schema.Types.Double
 });
 
 
