@@ -7,13 +7,17 @@ var events = require('events');
  * accelPress, brakePressed, inPark, and charging properties to enact change in the values.
  * @type {Function}
  */
+
 var TestCanEmitter = module.exports = function() {
+    this.elevation = 0;
+    this.prevElevation = 0;
 
     this.accelPressed = false;
     this.brakePressed = false;
     this.inPark = false;
     this.charging = false;
 
+    this.fuelConsumption = 0;
     this.batteryVoltage = 375;
     this.batteryCurrent = 0;
     this.batterySoc = 80;
@@ -29,15 +33,20 @@ var TestCanEmitter = module.exports = function() {
     this.vehicleAccel = 0;
     this.vehicleBrake = 0;
     this.vehicleSpeed = 0;
+    this.prevVehicleSpeed = 0;
     this.chargerVoltage = 0;
     this.chargerCurrent = 0;
 
     setInterval(_.bind(function() {
         if (this.accelPressed) {
+            this.elevation = Math.max(this.elevation, 1000);
+            this.prevElevation = Math.min(this.prevElevation, this.elevation);
+            this.fuelConsumption = 100;
             this.transGear = Math.max(Math.min(this.transGear + 0.2, 6), 1);
             this.transRatio = 6.12 / this.transGear;
             this.vehicleAccel = 100;
             this.vehicleBrake = 'no';
+            this.prevVehicleSpeed = this.vehicleSpeed;
             this.vehicleSpeed = Math.min(this.vehicleSpeed + 2, 120);
             this.engineRpm = Math.min(this.engineRpm + 100, 5000);
             this.engineTorque = 300;
@@ -50,10 +59,14 @@ var TestCanEmitter = module.exports = function() {
             this.batterySoc = Math.max(this.batterySoc - 0.4, 10);
             this.batteryTemp = Math.min(this.batteryTemp + 0.2, 100);
         } else if (this.brakePressed) {
+            this.elevation = Math.max(this.elevation, 1000);
+            this.prevElevation = Math.min(this.prevElevation, this.elevation);
+            this.fuelConsumption = 0;
             this.transGear = Math.max(this.transGear - 0.2, 1);
             this.transRatio = 6.12 / this.transGear;
             this.vehicleAccel = 0;
             this.vehicleBrake = 'yes';
+            this.prevVehicleSpeed = this.vehicleSpeed;
             this.vehicleSpeed = Math.max(this.vehicleSpeed - 2, 0);
             this.engineRpm = Math.max(this.engineRpm - 100, 1000);
             this.engineTorque = 20;
@@ -66,6 +79,9 @@ var TestCanEmitter = module.exports = function() {
             this.batterySoc = Math.min(this.batterySoc + 0.1, 100);
             this.batteryTemp = Math.max(this.batteryTemp - 0.2, 20);
         } else {
+            this.elevation = Math.max(this.elevation, 1000);
+            this.prevElevation = Math.min(this.prevElevation, this.elevation);
+            this.fuelConsumption = 25;
             this.transGear = 0;
             this.vehicleAccel = 0;
             this.vehicleBrake = 'no';
@@ -106,6 +122,10 @@ var TestCanEmitter = module.exports = function() {
         this.emit('vehicleSpeed', this.vehicleSpeed + random * 2);
         this.emit('chargerVoltage', this.chargerVoltage);
         this.emit('chargerCurrent', this.chargerCurrent);
+        // this.emit('DieselEnergyChange' DieselEnergy(this.fuelConsumption))
+        // this.emit('ElectricalEnergyChange', ElectricalEnergy(this.batteryVoltage, this.batteryCurrent))
+        // this.emit('KinecticEnergyChange', KinecticEnergy(this.vehicleSpeed, x))
+        // this.emit('PotentialEnergyChange', PotentialEnergy(this.elevation, this.prevElevation))
     }, this), 100);
 };
 util.inherits(TestCanEmitter, events.EventEmitter);

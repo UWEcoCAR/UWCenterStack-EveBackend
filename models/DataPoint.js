@@ -20,6 +20,10 @@ var dataPointSchema = mongoose.Schema({
     motorTemp: Number,
     batteryTemp: Number,
     elevation: Number,
+    DieselEnergyChange: Number,
+    ElectricalEnergyChange: Number,
+    KinecticEnergyChange: Number,
+    PotentialEnergyChange: Number,
     timestamp: {type: Date, default: Date.now}
 });
 
