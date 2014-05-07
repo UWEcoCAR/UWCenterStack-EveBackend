@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 
+
+
 var dataPointSchema = mongoose.Schema({
     tripId: mongoose.Schema.Types.ObjectId, 
     location: {lat: Number, long: Number},
