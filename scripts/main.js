@@ -1,7 +1,19 @@
 var directionsDisplay;
 var directionsService = new google.maps.DirectionsService();
 var map;
-var currentLines = [];
+var currentPoints = [];
+
+var fromColor = { // yellow
+  red: 208,
+  green: 221,
+  blue: 40
+};
+
+var toColor = { // purple
+  red: 102,
+  green: 45,
+  blue: 145
+};
 
 //google.maps.event.addDomListener(window, 'load', initialize);
 $(window).load(function() {
@@ -9,10 +21,85 @@ $(window).load(function() {
   var seattle = new google.maps.LatLng(47.6097, -122.3331);
   var mapOptions = {
     zoom: 6,
-    center: seattle
+    center: seattle,
+    mapTypeControlOptions: {
+        mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'usroadatlas']
+    }
   }
 
   map = new google.maps.Map($('#map')[0], mapOptions);
+
+  var roadAtlasStyles = [{
+      "featureType": "road.highway",
+      "elementType": "geometry",
+      "stylers": [
+        { "saturation": -100 },
+        { "lightness": -8 },
+        { "gamma": 1.18 }
+      ]
+  }, {
+      "featureType": "road.arterial",
+      "elementType": "geometry",
+      "stylers": [
+        { "saturation": -100 },
+        { "gamma": 1 },
+        { "lightness": -24 }
+      ]
+  }, {
+      "featureType": "poi",
+      "elementType": "geometry",
+      "stylers": [
+        { "saturation": -100 }
+      ]
+  }, {
+      "featureType": "administrative",
+      "stylers": [
+        { "saturation": -100 }
+      ]
+  }, {
+      "featureType": "transit",
+      "stylers": [
+        { "saturation": -100 }
+      ]
+  }, {
+      "featureType": "water",
+      "elementType": "geometry.fill",
+      "stylers": [
+        { "saturation": -100 }
+      ]
+  }, {
+      "featureType": "road",
+      "stylers": [
+        { "saturation": -100 },
+        { "lightness": -30 }
+      ]
+  }, {
+      "featureType": "administrative",
+      "stylers": [
+        { "saturation": -100 }
+      ]
+  }, {
+      "featureType": "landscape",
+      "stylers": [
+        { "saturation": -100 }
+      ]
+  }, {
+      "featureType": "poi",
+      "stylers": [
+        { "saturation": -100 }
+      ]
+  }];
+
+  var styledMapOptions = {
+
+  };
+
+  var usRoadMapType = new google.maps.StyledMapType(
+      roadAtlasStyles, styledMapOptions);
+
+  map.mapTypes.set('usroadatlas', usRoadMapType);
+  map.setMapTypeId('usroadatlas');
+
   directionsDisplay.setMap(map);
 });
 
@@ -119,7 +206,7 @@ function addEfficiency() {
   }).done(function(data) {
     var startOfRoute = addEfficiencyDataToMap(data);
     if (startOfRoute) {
-      map.setZoom(14);
+      map.setZoom(15);
       map.setCenter(startOfRoute);
 
       var summaryPanel = $('#directions')[0];
@@ -135,6 +222,29 @@ function addEfficiency() {
 
 function addEfficiencyDataToMap(data) {
   clearMap();
+  attachOptions(data);
+  var circle;
+  var duplicate = 2;
+  for (var i = 0; i < duplicate; i++) {
+    _.each(data, function(point) {
+      // Add the circle for this city to the map.
+      circle = new google.maps.Circle(point.options);
+      circle.setMap(map);
+      currentPoints.push(circle);
+      /*
+      var location = new google.maps.LatLng(point.location.lat, point.location.long);
+      var marker = new google.maps.Marker({
+          position: location,
+          map: map
+      });
+      marker.setMap(map);
+      currentPoints.push(marker);
+      */
+    });
+  }
+
+
+  /*
   if (data.length < 3) {
     return null;
   }
@@ -181,17 +291,48 @@ function addEfficiencyDataToMap(data) {
       strokeWeight: 3
     });
     onePath.setMap(map);
-    currentLines.push(onePath);
+    currentPoints.push(onePath);
     i = max;
   }
+  */
   return new google.maps.LatLng(data[0].location.lat, data[0].location.long);
 }
 
+function attachOptions(data) {
+  //var resultRed, resultGreen, resultBlue;
+  _.each(data, function(point) {
+    var percent = point.efficiency / 100;
+    var resultRed = Math.floor(fromColor.red + percent * (toColor.red - fromColor.red));
+    var resultGreen = Math.floor(fromColor.green + percent * (toColor.green - fromColor.green));
+    var resultBlue = Math.floor(fromColor.blue + percent * (toColor.blue - fromColor.blue));
+    var color = rgbToHex(resultRed, resultGreen, resultBlue);
+    point["options"] = {
+      strokeColor: color,
+      strokeOpacity: .9,
+      strokeWeight: 1,
+      fillColor: color,
+      fillOpacity: 0.2,
+      map: map,
+      center: new google.maps.LatLng(point.location.lat, point.location.long),
+      radius: 50
+    }
+  });
+}
+
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
 function clearMap() {
-  _.each(currentLines, function(line) {
+  _.each(currentPoints, function(line) {
     line.setMap(null);
   });
-  currentLines = [];
+  currentPoints = [];
 }
 
 function calculateColor(avg) {

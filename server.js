@@ -19,7 +19,7 @@ app.get("/getDataPoints", function(req, res) {
     for (var i = 0; i < data.length; i++) {
       efficiencyAndLocation.push({
         location: data[i].location,
-        efficiency: Math.floor((Math.random() * 25) + 1)
+        efficiency: Math.floor((Math.random() * 100) + 1)
       });
     }
     res.send(efficiencyAndLocation);
