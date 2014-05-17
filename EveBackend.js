@@ -10,7 +10,7 @@ var DieselEnergy = function(fuelConsumption) {
 }
 
 var ElectricalEnergy = function(volt, current) {
-    return volt * current * .1 / 3600.0;    
+    return volt * current * .1 / 3600.0;
 }
 
 var KinecticEnergy = function(speed, prevSpeed) {
@@ -24,6 +24,13 @@ var PotentialEnergy = function(elevation, prevElevation) {
 // initialize these to first datapoint
 var prevSpeed = 25;
 var prevElevation = 40;
+
+// Local variables to save data to update Trip every time
+// Can alternatively use trip.update but this should work as well
+var DE = 0;
+var EE = 0;
+var KE = 0;
+var PE = 0;
 
 module.exports.CanLogger = function(canReadWriter) {
     this.trip = new Trip({});
@@ -51,8 +58,12 @@ module.exports.CanLogger = function(canReadWriter) {
                 elevation: canReadWriter.getMail('elevation');
                 DieselEnergyChange: DieselEnergy(this.fuelConsumption);
                 ElectricalEnergyChange: ElectricalEnergy(this.batteryVoltage, this.batteryCurrent);
-                KinecticEnergyChange: KinecticEnergy(speed, prevSpeed);
-                PotentialEnergyChange: PotentialEnergy(elevation, prevElevation);
+                KinecticEnergyChange: KinecticEnergy(this.speed, prevSpeed);
+                PotentialEnergyChange: PotentialEnergy(this.elevation, prevElevation);
+                DE += this.DieselEnergyChange;
+                EE += this.ElectricalEnergyChange;
+                KE += this.KinecticEnergyChange;
+                PE += this.PotentialEnergyChange;
                 prevElevation = this.elevation
                 prevSpeed = this.speed
             }, function(err) {
@@ -60,5 +71,9 @@ module.exports.CanLogger = function(canReadWriter) {
             });
         }, this));
 
+    DieselEnergyChange: DE,
+    ElectricalEnergyChange: EE,
+    KinecticEnergyChange: KE,
+    PotentialEnergyChange: PE
     }, this));
 }

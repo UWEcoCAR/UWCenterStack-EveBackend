@@ -9,6 +9,10 @@ var userSchema = mongoose.Schema({
     distance: Number,
     MPGe: Number,
     cost: Number,
+    DieselEnergyChange: Number,
+    ElectricalEnergyChange: Number,
+    KinecticEnergyChange: Number,
+    PotentialEnergyChange: Number,
     dieselEnergy: Number,
     electricEnergy: Number
 });
@@ -23,6 +27,17 @@ userSchema.methods.calculate = function(callback) {
     console.log('calculated user: '+this._id);
     callback && callback();
 };
+
+/**
+ * Calculates the total MPGe given the current
+ * energy changes
+ */
+userSchema.methods.calcMPGe= function () {
+  var totalEnergyChange = this.DieselEnergyChange + this.ElectricalEnergyChange +
+    this.KinecticEnergyChange + this.PotentialEnergyChange;
+  var MPGe = (0.1 / 3600 * 0.621) / (totalEnergyChange / 1000 / 37.72);
+  return MPGe;
+}
 
 /**
  * Creates a new trip linked to the user

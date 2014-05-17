@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 
 
 var dataPointSchema = mongoose.Schema({
-    tripId: mongoose.Schema.Types.ObjectId, 
+    tripId: mongoose.Schema.Types.ObjectId,
     location: {lat: Number, long: Number},
     fuelConsumption: Number,
     pedalPosition: Number,
@@ -28,5 +28,16 @@ var dataPointSchema = mongoose.Schema({
     PotentialEnergyChange: Number,
     timestamp: {type: Date, default: Date.now}
 });
+
+/**
+ * Calculates the total MPGe given the current
+ * energy changes
+ */
+dataPointSchema.methods.calcMPGe= function () {
+  var totalEnergyChange = this.DieselEnergyChange + this.ElectricalEnergyChange +
+    this.KinecticEnergyChange + this.PotentialEnergyChange;
+  var MPGe = (0.1 / 3600 * 0.621) / (totalEnergyChange / 1000 / 37.72);
+  return MPGe;
+}
 
 module.exports = mongoose.model('DataPoint', dataPointSchema);

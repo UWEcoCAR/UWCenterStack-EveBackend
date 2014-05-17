@@ -16,13 +16,13 @@ var tripSchema = mongoose.Schema({
     distance: Number,
     cost: Number,
     speed: Number,
+    DieselEnergyChange: Number,
+    ElectricalEnergyChange: Number,
+    KinecticEnergyChange: Number,
+    PotentialEnergyChange: Number,
     dieselEnergy: Number,
     electricEnergy: Number
 });
-
-
-// define custom methods
-// Taken from nicks code
 
 /**
  * Updates the user stats based off of child trips
@@ -42,6 +42,17 @@ tripSchema.methods.newPoint = function(params, callback) {
     params.tripId = this._id;
     (new DataPoint(params)).save(callback);
 };
+
+/**
+ * Calculates the total MPGe given the current
+ * energy changes
+ */
+tripSchema.methods.calcMPGe= function () {
+  var totalEnergyChange = this.DieselEnergyChange + this.ElectricalEnergyChange +
+    this.KinecticEnergyChange + this.PotentialEnergyChange;
+  var MPGe = (0.1 / 3600 * 0.621) / (totalEnergyChange / 1000 / 37.72);
+  return MPGe;
+}
 
 // make remove and calculate cascade down
 tripSchema.pre('remove', function(next) {
