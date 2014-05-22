@@ -1,22 +1,24 @@
 var emitter = require('./TestCanEmitter');
 var EveBackend = require('./EveBackend').EveBackend;
 var _ = require('underscore');
+var User = require('./models/User');
 
 
 
 var eveBackend = new EveBackend(new emitter(), "Arush Shankar", function(user) {
-    // TODO:
-    // console.log(user.getMPGe());
-    // // array
-    // var trips = user.getTrips();
-    // _.each(trips, function(trip) {
-    //     console.log(trip.getMPGe());
-    //     console.log(trip.getElectricEnergyConsumption());
-    //     console.log(trip.getDieselEnergyConsumption());
-    //     console.log(trip.getElectricCost());
-    //     console.log(trip.getDieselCost());
-    // })
+    console.log('User MPGe: ' + user.getMPGe());
+    var trips = user.getTrips(function(trips) {
+        _.each(trips, function(trip) {
+            console.log('trip: ' + trip);
+            console.log("MPGe: " + trip.getMPGe());
+            console.log("Electric Energy Consumption: " + trip.getElectricalEnergyConsumption());
+            console.log("Diesel Energy Consumption: " + trip.getDieselEnergyConsumption());
+            console.log("Electric Cost: " + trip.getElectricCost());
+            console.log("Diesel Cost: " + trip.getDieselCost());
+        })
+    });
+
 });
 var users = eveBackend.getAllUsers(function(users){
-    console.log(users);
+    // console.log(users);
 });

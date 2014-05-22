@@ -19,12 +19,14 @@ var kinecticEnergy = function(speed, prevSpeed) {
 }
 
 var potentialEnergy = function(elevation, prevElevation) {
+
+
     return 2025 * 9.81 * (elevation - prevElevation) * 2.78 / 10000;
 }
 
 // initialize these to first datapoint
-var prevSpeed = 25;
-var prevElevation = 40;
+var prevSpeed = 0;
+var prevElevation = 0;
 
 // Local variables to save data to update Trip every time
 // Can alternatively use trip.update but this should work as well
@@ -32,28 +34,31 @@ var DE = 0;
 var EE = 0;
 var KE = 0;
 var PE = 0;
+var speed = 0;
+module.exports.EveBackend = function(canReadWriter, username, callback) {
 
-module.exports.EveBackend = function(canReadWriter, username) {
   var name = username.split(" ");
   console.log(name);
   var self = this;
+  // Finds or makes a User
   User.findOne({firstName: name[0], lastName: name[1]}, function(err,user) {
     if (user == null) {
       this.user = new User({
         firstName: name[0],
         lastName: name[1],
-        distance: 0,
-        MPGe: 0,
-        cost: 0,
-        dieselEnergy: 0,
-        electricEnergy: 0
       });
       this.user.save();
     } else {
       this.user = user;
     }
+    // Adds a new trip
     this.user.newTrip({}, function(trip) {
         this.timer = new Timer().setInterval(100, 5, _.bind(function() {
+        DE = dieselEnergy(canReadWriter.getMail('fuelConsumption'));
+        EE = electricalEnergy(canReadWriter.getMail('batteryVoltage'), canReadWriter.getMail('batteryCurrent'));
+        KE = kinecticEnergy(canReadWriter.getMail('vehicleSpeed'), prevSpeed);
+        PE = potentialEnergy(canReadWriter.getMail('elevation'), prevElevation);
+        speed = canReadWriter.getMail('vehicleSpeed');
             trip.newPoint({
                 location: {
                     lat: canReadWriter.getMail('gpsLatitude'),
@@ -78,21 +83,31 @@ module.exports.EveBackend = function(canReadWriter, username) {
                 kinecticEnergyChange: kinecticEnergy(canReadWriter.getMail('vehicleSpeed'), prevSpeed),
                 potentialEnergyChange: potentialEnergy(canReadWriter.getMail('elevation'), prevElevation)
             }, function(dataPoint) {
-                //console.log(dataPoint);
-                prevElevation = dataPoint.elevation,
-                prevSpeed = dataPoint.speed
-                DE += dataPoint.dieselEnergyChange;
-                EE += dataPoint.electricalEnergyChange;
-                KE += dataPoint.kinecticEnergyChange;
-                PE += dataPoint.potentialEnergyChange;
+                prevElevation = dataPoint.elevation;
+                prevSpeed = dataPoint.speed;
+                // console.log(speed)
+
             });
-            trip.update({
-                dieselEnergyChange: DE,
-                electricalEnergyChange: EE,
-                kinecticEnergyChange: KE,
-                potentialEnergyChange: PE
+            trip.distance += speed * 0.1;
+            trip.dieselEnergy += DE;
+            trip.electricalEnergy += EE;
+            trip.kinecticEnergy += KE;
+            trip.potentialEnergy += PE;
+            // console.log(trip.potentialEnergy);
+            trip.save(function(err) {
+                err && console.error(err);
+            });
+            user.dieselEnergy += DE;
+            user.electricalEnergy += EE;
+            user.kinecticEnergy += KE;
+            user.potentialEnergy += PE;
+            user.distance += speed * 0.1;
+            // console.log(speed);
+            user.save(function(err) {
+                err && console.error(err);
             });
         }, this));
+        callback(user);
     });
   });
 }
@@ -100,9 +115,6 @@ module.exports.EveBackend = function(canReadWriter, username) {
 module.exports.EveBackend.prototype.getAllUsers = function(callback) {
     User.find(function(err, results) {
         if(!err) {
-            // _.each(results, function(user) {
-            //     console.log(user);
-            // });
             callback(results);
         } else {
             console.log(err);

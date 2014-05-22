@@ -6,15 +6,12 @@ var mongoose = require('mongoose'),
 var userSchema = mongoose.Schema({
     firstName: {type:String, default: ""},
     lastName: {type:String, default: ""},
-    distance: Number,
-    MPGe: Number,
-    cost: Number,
-    DieselEnergyChange: Number,
-    ElectricalEnergyChange: Number,
-    KinecticEnergyChange: Number,
-    PotentialEnergyChange: Number,
-    dieselEnergy: Number,
-    electricEnergy: Number
+    distance: {type: Number, default: 0},
+    cost: {type: Number, default: 0},
+    dieselEnergy: {type: Number, default: 0},
+    electricalEnergy: {type: Number, default: 0},
+    kinecticEnergy: {type: Number, default: 0},
+    potentialEnergy: {type: Number, default: 0}
 });
 
 // define custom methods
@@ -32,10 +29,10 @@ userSchema.methods.calculate = function(callback) {
  * Calculates the total MPGe given the current
  * energy changes
  */
-userSchema.methods.calcMPGe= function () {
-    var totalEnergyChange = this.DieselEnergyChange + this.ElectricalEnergyChange +
-    this.KinecticEnergyChange + this.PotentialEnergyChange;
-    var MPGe = (0.1 / 3600 * 0.621) / (totalEnergyChange / 1000 / 37.72);
+userSchema.methods.getMPGe = function () {
+    var totalEnergyChange = this.dieselEnergy + this.electricalEnergy +
+    this.kinecticEnergy + this.potentialEnergy;
+    var MPGe = - (this.distance/1000 * 0.621) / (totalEnergyChange / 1000 / 37.72);
     return MPGe;
 }
 
@@ -49,6 +46,13 @@ userSchema.methods.newTrip = function(params, callback) {
     var trip = new Trip(params);
     trip.save(function() {
         callback(trip);
+    });
+}
+
+// Gets all trips for that user
+userSchema.methods.getTrips = function(callback) {
+    Trip.find({userId : this._id}, function(err, trips) {
+        callback(trips);
     });
 }
 

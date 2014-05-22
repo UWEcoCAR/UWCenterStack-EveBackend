@@ -12,16 +12,12 @@ var tripSchema = mongoose.Schema({
         time: Date,
         location: {lat: Number, long: Number}
     },
-    MPGe: Number,
-    distance: Number,
+    distance: {type: Number, default: 0},
     cost: Number,
-    speed: Number,
-    dieselEnergyChange: Number,
-    electricalEnergyChange: Number,
-    kinecticEnergyChange: Number,
-    potentialEnergyChange: Number,
-    dieselEnergy: Number,
-    electricEnergy: Number
+    dieselEnergy: {type: Number, default: 0},
+    electricalEnergy: {type: Number, default: 0},
+    kinecticEnergy: {type: Number, default: 0},
+    potentialEnergy: {type: Number, default: 0}
 });
 
 
@@ -41,11 +37,33 @@ tripSchema.methods.calculate = function(callback) {
  * Calculates the total MPGe given the current
  * energy changes
  */
-tripSchema.methods.calcMPGe= function () {
-  var totalEnergyChange = this.DieselEnergyChange + this.ElectricalEnergyChange +
-    this.KinecticEnergyChange + this.PotentialEnergyChange;
-  var MPGe = (0.1 / 3600 * 0.621) / (totalEnergyChange / 1000 / 37.72);
+tripSchema.methods.getMPGe = function() {
+  var totalEnergyChange = this.dieselEnergy + this.electricalEnergy +
+    this.kinecticEnergy + this.potentialEnergy;
+  var MPGe = -(this.distance / 1000 * 0.621) / (totalEnergyChange / 1000 / 37.72);
   return MPGe;
+}
+
+// Gets Diesel Eenrgy Consumption
+tripSchema.methods.getDieselEnergyConsumption = function() {
+    return this.dieselEnergy;
+}
+
+// Gets electrical energy consumption
+tripSchema.methods.getElectricalEnergyConsumption = function() {
+    return this.electricalEnergy;
+}
+
+// Gets total diesel Cost
+tripSchema.methods.getDieselCost= function() {
+    var dieselEnergyCost = - (this.dieselEnergy / 1000 / 37.72 * 3.98) / (this.distance / 1000 * 0.621);
+    return dieselEnergyCost;
+}
+
+// gets total Electric Cost
+tripSchema.methods.getElectricCost= function() {
+    var electricalEnergyCost = - this.electricalEnergy / 1000 * 0.11 / (this.distance / 1000 * 0.621);
+    return electricalEnergyCost;
 }
 
 /**

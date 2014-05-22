@@ -17,9 +17,9 @@ var TestCanEmitter = module.exports = function() {
     this.inPark = false;
     this.charging = false;
 
-    this.fuelConsumption = 0;
+    this.fuelConsumption = 7;
     this.batteryVoltage = 375;
-    this.batteryCurrent = 0;
+    this.batteryCurrent = -25;
     this.batterySoc = 80;
     this.batteryTemp = 20;
     this.motorRpm = 0;
@@ -32,15 +32,12 @@ var TestCanEmitter = module.exports = function() {
     this.engineTemp = 20;
     this.vehicleAccel = 0;
     this.vehicleBrake = 0;
-    this.vehicleSpeed = 0;
-    this.prevVehicleSpeed = 0;
+    this.vehicleSpeed = 50;
     this.chargerVoltage = 0;
     this.chargerCurrent = 0;
 
     setInterval(_.bind(function() {
         if (this.accelPressed) {
-            this.elevation = Math.max(this.elevation, 1000);
-            this.prevElevation = Math.min(this.prevElevation, this.elevation);
             this.fuelConsumption = 100;
             this.transGear = Math.max(Math.min(this.transGear + 0.2, 6), 1);
             this.transRatio = 6.12 / this.transGear;
@@ -59,8 +56,6 @@ var TestCanEmitter = module.exports = function() {
             this.batterySoc = Math.max(this.batterySoc - 0.4, 10);
             this.batteryTemp = Math.min(this.batteryTemp + 0.2, 100);
         } else if (this.brakePressed) {
-            this.elevation = Math.max(this.elevation, 1000);
-            this.prevElevation = Math.min(this.prevElevation, this.elevation);
             this.fuelConsumption = 0;
             this.transGear = Math.max(this.transGear - 0.2, 1);
             this.transRatio = 6.12 / this.transGear;
@@ -78,18 +73,7 @@ var TestCanEmitter = module.exports = function() {
             this.batteryCurrent = -200;
             this.batterySoc = Math.min(this.batterySoc + 0.1, 100);
             this.batteryTemp = Math.max(this.batteryTemp - 0.2, 20);
-        } else {
-            this.elevation = Math.max(this.elevation, 1000);
-            this.prevElevation = Math.min(this.prevElevation, this.elevation);
-            this.fuelConsumption = 25;
-            this.transGear = 0;
-            this.vehicleAccel = 0;
-            this.vehicleBrake = 'no';
-            this.engineTorque = 20;
-            this.motorTorque = 0;
-            this.batteryVoltage = 375;
-            this.batteryCurrent = 0.0;
-        }
+        } else {}
 
         if (this.inPark) {
             this.transGear = -2;
@@ -105,6 +89,7 @@ var TestCanEmitter = module.exports = function() {
 
         var random = Math.random();
         var randomAroundZero = random - 0.5;
+        this.emit('distance', random*50)
         this.emit('batteryVoltage', this.batteryVoltage + randomAroundZero);
         this.emit('batteryCurrent', this.batteryCurrent + randomAroundZero * 10);
         this.emit('batterySoc', this.batterySoc);
