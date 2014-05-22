@@ -3,21 +3,21 @@ var mongoose = require('mongoose'),
 
 // create trip schema
 var tripSchema = mongoose.Schema({
-    userId: mongoose.Schema.Types.ObjectId,
-    startLocation: {
-        time: {type: Date, default: Date.now},
-        location: {lat: Number, long: Number}
-    },
-    endLocation: {
-        time: Date,
-        location: {lat: Number, long: Number}
-    },
-    MPGe: Number,
-    distance: Number,
-    cost: Number,
-    speed: Number,
-    dieselEnergy: Number,
-    electricEnergy: Number
+  userId: mongoose.Schema.Types.ObjectId,
+  startLocation: {
+    time: {type: Date, default: Date.now},
+    location: {lat: Number, long: Number}
+  },
+  endLocation: {
+    time: Date,
+    location: {lat: Number, long: Number}
+  },
+  MPGe: Number,
+  distance: Number,
+  cost: Number,
+  speed: Number,
+  dieselEnergy: Number,
+  electricEnergy: Number
 });
 
 
@@ -29,8 +29,8 @@ var tripSchema = mongoose.Schema({
  * @param Closure callback
  */
 tripSchema.methods.calculate = function(callback) {
-    console.log('calculated trip: '+this._id);
-    callback && callback(null, this);
+  console.log('calculated trip: '+this._id);
+  callback && callback(null, this);
 };
 
 /**
@@ -39,17 +39,17 @@ tripSchema.methods.calculate = function(callback) {
  * @param Closure callback
  */
 tripSchema.methods.newPoint = function(params, callback) {
-    params.tripId = this._id;
-    (new DataPoint(params)).save(callback);
+  params.tripId = this._id;
+  (new DataPoint(params)).save(callback);
 };
 
 // make remove and calculate cascade down
 tripSchema.pre('remove', function(next) {
-    DataPoint.find({tripId : this._id}).remove(next);
+  DataPoint.find({tripId : this._id}).remove(next);
 });
 tripSchema.pre('calculate', function(next) {
-    // not cascading this yet, might not even need too
-    next();
+  // not cascading this yet, might not even need too
+  next();
 });
 
 // finally export the Model

@@ -31,7 +31,10 @@ userSchema.methods.calculate = function(callback) {
  */
 userSchema.methods.newTrip = function(params, callback) {
     params.userId = this._id;
-    (new Trip(params)).save(callback);
+    var trip = new Trip(params);
+    trip.save(function() {
+        callback(trip);
+    });
 }
 
 // cascade delete and calculate
