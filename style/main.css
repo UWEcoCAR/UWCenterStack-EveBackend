@@ -1,11 +1,27 @@
-html, body, #map {
+html, body, #mapAndCanvasContainer {
   height: 100%;
   margin: 0px;
   padding: 0px
 }
 
+#map, #mapCanvas {
+  position: absolute;
+}
+
+
 #map {
-  float:left;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+
+#mapCanvas {
+  z-index: 200;
+}
+
+#mapAndCanvasContainer {
+  float: left;
+  position: relative;
   width:70%;
   height:100%;
 }

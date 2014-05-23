@@ -54,4 +54,4 @@ tripSchema.pre('calculate', function(next) {
 });
 
 // finally export the Model
-module.exports = mongoose.model('Trip', tripSchema);
+module.exports = mongoose.model('trips', tripSchema);

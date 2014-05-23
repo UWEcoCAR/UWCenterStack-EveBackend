@@ -14,7 +14,6 @@ var UserModel = require("./models.js/User.js"),
 app.get("/getDataPoints", function(req, res) {
   console.log("request for data points");
   databaseQueries.getDataPoints(function(data) {
-    console.log("I got the data", data);
     var efficiencyAndLocation = [];
     for (var i = 0; i < data.length; i++) {
       efficiencyAndLocation.push({
@@ -46,23 +45,28 @@ var User;
 var Trip;
 var DataPoint;
 
-mongoose.connect('mongodb://localhost/ecocarData');
+mongoose.connect('mongodb://localhost/ecocar2');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 var databaseQueries = {};
 
 db.once('open', function(callback) {
   // ready
+  mongoose.connection.db.collectionNames(function (err, names) {
+    console.log(names);
+  });
   console.log("database ready");
 
-  User = mongoose.model('User', UserModel, 'User');
-  Trip = mongoose.model('Trip', TripModel, 'Trip');
-  DataPoint = mongoose.model('DataPoint', DataPointModel, 'DataPoint');
+  //User = mongoose.model('User', UserModel, 'User');
+  Trip = mongoose.model('trips', TripModel, 'trips');
+  DataPoint = mongoose.model('datapoints', DataPointModel, 'datapoints');
 
   databaseQueries.getDataPoints = function(callback) {
+    var start = new Date().getTime();
     return DataPoint.find(function(err, dataPts) {
       if (err) return console.log(err);
-      console.log(dataPts);
+      var end = new Date().getTime();
+      console.log('milliseconds passed', end - start);
       callback(dataPts);
     });
   }

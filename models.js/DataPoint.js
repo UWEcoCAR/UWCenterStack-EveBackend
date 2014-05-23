@@ -24,4 +24,4 @@ var dataPointSchema = mongoose.Schema({
     timestamp: {type: Date, default: Date.now}
 });
 
-module.exports = mongoose.model('DataPoint', dataPointSchema);
+module.exports = mongoose.model('datapoints', dataPointSchema);
