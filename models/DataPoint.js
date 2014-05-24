@@ -24,6 +24,7 @@ var dataPointSchema = mongoose.Schema({
     electricalEnergyChange: Number,
     kinecticEnergyChange: Number,
     potentialEnergyChange: Number,
+    vehicleEfficiencyScore: {type: Number, default: 0},
     timestamp: {type: Date, default: Date.now}
 });
 
@@ -34,7 +35,7 @@ var dataPointSchema = mongoose.Schema({
 dataPointSchema.methods.calcMPGe= function () {
   var totalEnergyChange = this.dieselEnergyChange + this.electricalEnergyChange +
     this.kinecticEnergyChange + this.potentialEnergyChange;
-  var MPGe = (0.1 / 3600 * 0.621) / (totalEnergyChange / 1000 / 37.72);
+  var MPGe = (this.speed * 0.1 / 3600 * 0.621) / (totalEnergyChange / 1000 / 37.72);
   return MPGe;
 }
 

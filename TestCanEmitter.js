@@ -108,10 +108,6 @@ var TestCanEmitter = module.exports = function() {
         this.emit('chargerVoltage', this.chargerVoltage);
         this.emit('chargerCurrent', this.chargerCurrent);
         this.emit('elevation', this.elevation);
-        // this.emit('DieselEnergyChange' DieselEnergy(this.fuelConsumption))
-        // this.emit('ElectricalEnergyChange', ElectricalEnergy(this.batteryVoltage, this.batteryCurrent))
-        // this.emit('KinecticEnergyChange', KinecticEnergy(this.vehicleSpeed, x))
-        // this.emit('PotentialEnergyChange', PotentialEnergy(this.elevation, this.prevElevation))
     }, this), 100);
 };
 util.inherits(TestCanEmitter, events.EventEmitter);

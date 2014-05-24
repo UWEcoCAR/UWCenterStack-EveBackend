@@ -36,6 +36,7 @@ tripSchema.methods.calculate = function(callback) {
 /**
  * Calculates the total MPGe given the current
  * energy changes
+ * @returns {MPGe this trip}
  */
 tripSchema.methods.getMPGe = function() {
   var totalEnergyChange = this.dieselEnergy + this.electricalEnergy +
@@ -44,26 +45,47 @@ tripSchema.methods.getMPGe = function() {
   return MPGe;
 }
 
-// Gets Diesel Eenrgy Consumption
+/**
+ *
+ * @returns {Diesel Consumed this trip}
+ */
 tripSchema.methods.getDieselEnergyConsumption = function() {
     return this.dieselEnergy;
 }
 
-// Gets electrical energy consumption
+/**
+ *
+ * @returns {Electricity Consumed this trip}
+ */
 tripSchema.methods.getElectricalEnergyConsumption = function() {
     return this.electricalEnergy;
 }
 
-// Gets total diesel Cost
+/**
+ *
+ * @returns {Diesel Cost this trip}
+ */
 tripSchema.methods.getDieselCost= function() {
     var dieselEnergyCost = - (this.dieselEnergy / 1000 / 37.72 * 3.98) / (this.distance / 1000 * 0.621);
     return dieselEnergyCost;
 }
 
-// gets total Electric Cost
-tripSchema.methods.getElectricCost= function() {
+/**
+ *
+ * @returns {Electricity Cost this trip}
+ */
+tripSchema.methods.getElectricCost = function() {
     var electricalEnergyCost = - this.electricalEnergy / 1000 * 0.11 / (this.distance / 1000 * 0.621);
     return electricalEnergyCost;
+}
+
+/**
+ *
+ * @returns {*[Elecrtical Energy Consumed, Diesel Energy Consumed]}
+ */
+tripSchema.methods.calculateConsumptions = function() {
+  var energyConsumed = [this.electricalEnergy, this.dieselEnergy];
+  return energyConsumed;
 }
 
 /**
