@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 var dataPointSchema = mongoose.Schema({
     tripId: mongoose.Schema.Types.ObjectId,
-    location: {lat: Number, long: Number},
+    geo: {type: [Number], index: '2d'},
     fuelConsumption: Number,
     pedalPosition: Number,
     optimalPosition: Number,
