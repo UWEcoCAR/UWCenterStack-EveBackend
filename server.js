@@ -12,16 +12,16 @@ var UserModel = require("./models.js/User.js"),
     DataPointModel = require('./models.js/DataPoint.js');
 
 app.get("/getDataPoints", function(req, res) {
-  console.log("request for data points");
-  databaseQueries.getDataPoints(function(data) {
+  console.log('getDataPoints: ' + JSON.stringify(req.query));
+  databaseQueries.getDataPoints(req.query, function(data) {
     var efficiencyAndLocation = [];
-    for (var i = 0; i < data.length; i++) {
-      efficiencyAndLocation.push({
-        location: data[i].location,
-        efficiency: Math.floor((Math.random() * 100) + 1)
-      });
-    }
-    res.send(efficiencyAndLocation);
+    // for (var i = 0; i < data.length; i++) {
+    //   efficiencyAndLocation.push({
+    //     location: data[i].location,
+    //     efficiency: Math.floor((Math.random() * 100) + 1)
+    //   });
+    // }
+    res.send(data);
   });
 });
 
@@ -61,14 +61,58 @@ db.once('open', function(callback) {
   Trip = mongoose.model('trips', TripModel, 'trips');
   DataPoint = mongoose.model('datapoints', DataPointModel, 'datapoints');
 
-  databaseQueries.getDataPoints = function(callback) {
-    var start = new Date().getTime();
-    return DataPoint.find(function(err, dataPts) {
-      if (err) return console.log(err);
-      var end = new Date().getTime();
-      console.log('milliseconds passed', end - start);
-      callback(dataPts);
-    });
+  databaseQueries.getDataPoints = function(range, callback) {
+      var topLeft     = [range.left,range.top];
+      var bottomRight = [range.right,range.bottom];
+      var topRight    = [range.right,range.top];
+      var bottomLeft  = [range.left,range.bottom];
+
+      DataPoint.find({ 
+          geo: {
+              $geoWithin : {
+                  $geometry: {
+                      type: "Polygon",
+                      coordinates: [
+                        [
+                          topLeft,
+                          topRight,
+                          bottomRight,
+                          bottomLeft,
+                          topLeft
+                        ]
+                      ]
+                  }
+              }
+          }
+      }, function(err, results) {
+        if (err) console.log(err);
+        callback(results);
+      });
+
+
+    // var bounds = {
+    //   type: "Feature",
+    //   geometry : {
+    //     type: "Polygon",
+    //     coordinates: [
+    //       [
+    //         range.topLeft, range.topRight, range.bottomRight, range.bottomLeft
+    //       ]
+    //     ]
+    //   }
+    // }
+    // return DataPoint.find({geo: { $geoWithin: bounds }}, callback);
+    /*
+    return DataPoint.find()
+      .where('location.lat').gte(range.bottom).lte(range.top)
+      .where('location.long').gte(range.right).lte(range.left)
+      .exec(function(err, dataPts) {
+        if (err) return console.log(err);
+
+        console.log("got", dataPts);
+        callback(dataPts);
+      });
+*/
   }
 });
 

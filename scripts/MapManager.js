@@ -1,19 +1,29 @@
 /**
  * A MapManager for plotting location based efficiency on top of a google maps map
- * 
  *
+ *var fromColor = { // yellow
+  red: 208,
+  green: 221,
+  blue: 40
+};
+
+var toColor = { // purple
+  red: 102,
+  green: 45,
+  blue: 145
+};
  *
  *
  */
-
 var MapManager = function (currentLocation, width, height) {
-    this.WIDTH = 400;
-    this.HEIGHT = 400;
+    this.WIDTH = 800;
+    this.HEIGHT = 800;
     this.location = currentLocation;
     this.MAP_ID = "MapManager-map";
     this.CANVAS_ID = "MapManager-canvas";
+    this.reqEfficiency = false;
 
-    this.getMap = function() {
+    this.getMap = function () {
         var container = $('<div style="position:relative;"></div>');
         this.canvas = $('<canvas>', {
             "id": this.CANVAS_ID,
@@ -50,93 +60,100 @@ var MapManager = function (currentLocation, width, height) {
 
         this.googleMapsMap = new google.maps.Map(this.map.get(0), mapOptions);
         this.directionsDisplay.setMap(this.googleMapsMap);
-        
+
         var roadAtlasStyles = [{
-              "featureType": "road.highway",
-              "elementType": "geometry",
-              "stylers": [
-                { "saturation": -100 },
-                { "lightness": -8 },
-                { "gamma": 1.18 }
-              ]
-          }, {
-              "featureType": "road.arterial",
-              "elementType": "geometry",
-              "stylers": [
-                { "saturation": -100 },
-                { "gamma": 1 },
-                { "lightness": -24 }
-              ]
-          }, {
-              "featureType": "poi",
-              "elementType": "geometry",
-              "stylers": [
-                { "saturation": -100 }
-              ]
-          }, {
-              "featureType": "administrative",
-              "stylers": [
-                { "saturation": -100 }
-              ]
-          }, {
-              "featureType": "transit",
-              "stylers": [
-                { "saturation": -100 }
-              ]
-          }, {
-              "featureType": "water",
-              "elementType": "geometry.fill",
-              "stylers": [
-                { "saturation": -100 }
-              ]
-          }, {
-              "featureType": "road",
-              "stylers": [
-                { "saturation": -100 },
-                { "lightness": -30 }
-              ]
-          }, {
-              "featureType": "administrative",
-              "stylers": [
-                { "saturation": -100 }
-              ]
-          }, {
-              "featureType": "landscape",
-              "stylers": [
-                { "saturation": -100 }
-              ]
-          }, {
-              "featureType": "poi",
-              "stylers": [
-                { "saturation": -100 }
-              ]
-          }];
+            "featureType": "road.highway",
+            "elementType": "geometry",
+            "stylers": [{
+                "saturation": -100
+            }, {
+                "lightness": -8
+            }, {
+                "gamma": 1.18
+            }]
+        }, {
+            "featureType": "road.arterial",
+            "elementType": "geometry",
+            "stylers": [{
+                "saturation": -100
+            }, {
+                "gamma": 1
+            }, {
+                "lightness": -24
+            }]
+        }, {
+            "featureType": "poi",
+            "elementType": "geometry",
+            "stylers": [{
+                "saturation": -100
+            }]
+        }, {
+            "featureType": "administrative",
+            "stylers": [{
+                "saturation": -100
+            }]
+        }, {
+            "featureType": "transit",
+            "stylers": [{
+                "saturation": -100
+            }]
+        }, {
+            "featureType": "water",
+            "elementType": "geometry.fill",
+            "stylers": [{
+                "saturation": -100
+            }]
+        }, {
+            "featureType": "road",
+            "stylers": [{
+                "saturation": -100
+            }, {
+                "lightness": -30
+            }]
+        }, {
+            "featureType": "administrative",
+            "stylers": [{
+                "saturation": -100
+            }]
+        }, {
+            "featureType": "landscape",
+            "stylers": [{
+                "saturation": -100
+            }]
+        }, {
+            "featureType": "poi",
+            "stylers": [{
+                "saturation": -100
+            }]
+        }];
 
-          var styledMapOptions = {};
 
-          var usRoadMapType = new google.maps.StyledMapType(
-              roadAtlasStyles, styledMapOptions);
 
-          this.googleMapsMap.mapTypes.set('usroadatlas', usRoadMapType);
-          this.googleMapsMap.setMapTypeId('usroadatlas');
+
+        var styledMapOptions = {};
+
+        var usRoadMapType = new google.maps.StyledMapType(
+            roadAtlasStyles, styledMapOptions);
+
+        this.googleMapsMap.mapTypes.set('usroadatlas', usRoadMapType);
+        this.googleMapsMap.setMapTypeId('usroadatlas');
 
         // add event listeners
         var me = this;
-        // google.maps.event.addListener(this.googleMapsMap, 'center_changed', function() {
-        //     me.clearCanvas();
-        //     //me.showEfficiency(function() {});
-        // });
-
-        google.maps.event.addListener(this.googleMapsMap, 'zoom_changed', function() {
-            me.clearCanvas();
-        })
-
-        // google.maps.event.addListener(this.googleMapsMap, 'bounds_changed', function() {
-        //     me.clearCanvas();
-        //     //me.showEfficiency(function() {});
+        // google.maps.event.addListener(this.googleMapsMap, 'center_changed', function () {
+        //     me.clearMap();
+        //     console.log("center changed");
+        //     me.displayEfficiency(function () {});
         // });
 
 
+        // google.maps.event.addListener(me.googleMapsMap, 'zoom_changed', function () {
+        //     me.clearMap();
+        //     console.log("zoom changed");
+        //     google.maps.event.addListenerOnce(me.googleMapsMap, 'bounds_changed', function (e) {
+        //         me.displayEfficiency();
+        //     });
+        // });
 
         this.canvas.get(0).fillStyle = "rgba(255, 255, 255, 0.5)";
         this.context = this.canvas.get(0).getContext('2d');
@@ -145,43 +162,61 @@ var MapManager = function (currentLocation, width, height) {
         return container;
     }
 
-    this.showEfficiency = function(currentLocation, callback) {
-        this.clearCanvas();
+    this.showEfficiency = function (currentLocation, callback) {
+        this.clearMap();
         var me = this;
+        this.reqEfficiency = true;
         me.googleMapsMap.setCenter(new google.maps.LatLng(currentLocation.location.lat, currentLocation.location.long));
+        this.displayEfficiency(function() {});
 
+    }
+
+    this.displayEfficiency = function (callback) {
+        console.log("display efficiency");
         var start = new Date().getTime();
+
+        var bounds = new google.maps.LatLngBounds();
+        bounds = this.googleMapsMap.getBounds();
+
+        var topLeft = bounds.getNorthEast();
+        var bottomRight = bounds.getSouthWest();
+
+        var me = this;
+        var left = topLeft.lng();
+        var top = topLeft.lat();
+        var right = bottomRight.lng();
+        var bottom = bottomRight.lat();
+        var height = Math.abs(top - bottom);
+        var width = Math.abs(left - right);
+        var canvasWidth = me.canvas.get(0).width;
+        var canvasHeight = me.canvas.get(0).height;
 
         $.ajax({
             url: "/getDataPoints",
-            type: 'GET'
+            type: 'GET',
+            data: {
+              top: top,
+              bottom: bottom,
+              left: left,
+              right: right
+            }
         }).done(function (data) {
+            console.log(data);
+            console.log(topLeft);
+            console.log(bottomRight);
             var end = new Date().getTime();
             console.log('milliseconds passed', end - start);
 
-            var bounds = me.googleMapsMap.getBounds();
-            var topLeft = bounds.getNorthEast();
-            var bottomRight = bounds.getSouthWest();
-            var left = topLeft.lng();
-            var top = topLeft.lat();
-            var right = bottomRight.lng();
-            var bottom = bottomRight.lat();
-            var height = Math.abs(top - bottom);
-            var width = Math.abs(left - right);
-
-            var canvasWidth = me.canvas.get(0).width;
-            var canvasHeight = me.canvas.get(0).height;
 
             console.log("canvas height: " + canvasHeight + " canvas width: " + canvasWidth);
             var zoom = me.googleMapsMap.getZoom();
             var radius = Math.pow(1.18, zoom);
-
             _.each(data, function (point) {
-                var latLng = new google.maps.LatLng(point.location.lat, point.location.long);
+                var latLng = new google.maps.LatLng(point.geo[1], point.geo[0]);
                 if (bounds.contains(latLng)) { // this point lies in the map, plot it on the canvas!
                     // calculate distance from top left
-                    var fromTop = Math.abs(top - point.location.lat);
-                    var fromLeft =  Math.abs(left - point.location.long);
+                    var fromTop = Math.abs(top - point.geo[1]);
+                    var fromLeft = Math.abs(left - point.geo[0]);
                     var ratioTop = fromTop / height;
                     var ratioLeft = fromLeft / width;
 
@@ -190,7 +225,6 @@ var MapManager = function (currentLocation, width, height) {
 
                     me.context.beginPath();
                     me.context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-                    me.context.shadowBlur = 4;
                     me.context.fillStyle = me.calculateColor(Math.floor((Math.random() * 10) + 1));
                     me.context.fill();
                     me.context.closePath();
@@ -200,17 +234,26 @@ var MapManager = function (currentLocation, width, height) {
         });
     }
 
-    this.calculateColor = function(efficiency) {
+    this.calculateColor = function (efficiency) {
         var efficiency = parseInt(efficiency);
 
         if (efficiency > 5) {
-            return 'rgba(255, 0, 0, 0.01)';
+            return 'rgba(208, 221, 40, .1)'; // yellow - good
         } else {
-            return 'rgba(0, 0, 255, 0.01)';
+            return 'rgba(102, 45, 145, .1)'; // purple - bad
         }
     }
 
-    this.clearCanvas = function() {
+    this.clearMap = function () {
         this.context.clearRect(0, 0, this.canvas.get(0).width, this.canvas.get(0).height);
+    }
+
+    function rgbToHex(r, g, b) {
+        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+    }
+
+    function componentToHex(c) {
+        var hex = c.toString(16);
+        return hex.length == 1 ? "0" + hex : hex;
     }
 }
