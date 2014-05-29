@@ -6,14 +6,12 @@ $(window).load(function() {
 });
 
 function addEfficiency() {
-  $("#mapAndCanvasContainer").activity();
   mapManager.showEfficiency({
     efficiency: 10,
     timestamp: "Thu May 22 2014 16:23:54 GMT-0700 (PDT)",
     location: { lat: 47.654109, long: -122.304331 } }, function() {
     console.log("done");
   }, function() {
-    $("#mapAndCanvasContainer").activity(false);
   });
 }
 

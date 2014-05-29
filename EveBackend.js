@@ -144,6 +144,43 @@ module.exports.EveBackend.prototype.getAllUsers = function(callback) {
 }
 
 /**
+ * Finds all the data points in the specified range
+ * @param range    - The area to get data points from
+ * @param callback - Closure callback on all the users
+ */
+module.exports.EveBackend.prototype.getDataPointsInRange = function(range, callback) {
+  var topLeft     = [range.left,range.top];
+  var bottomRight = [range.right,range.bottom];
+  var topRight    = [range.right,range.top];
+  var bottomLeft  = [range.left,range.bottom];
+
+  DataPoint.find({ 
+      geo: {
+          $geoWithin : {
+              $geometry: {
+                  type: "Polygon",
+                  coordinates: [
+                    [
+                      topLeft,
+                      topRight,
+                      bottomRight,
+                      bottomLeft,
+                      topLeft // close off the polygon
+                    ]
+                  ]
+              }
+          }
+      }
+  }, function(err, results) {
+    if (err) console.log(err);
+    _.each(results, function(point) {
+      point.efficiecy = point.calcMPGe();
+    });
+    callback(results);
+  });
+}
+
+/**
  * Given a username, finds all trips and calls callback on them
  * @param username
  * @param callback

@@ -31,7 +31,7 @@ var dataPointSchema = mongoose.Schema({
 /**
  * Calculates the total MPGe given the current
  * energy changes
- */
+ */ 
 dataPointSchema.methods.calcMPGe= function () {
   var totalEnergyChange = this.dieselEnergyChange + this.electricalEnergyChange +
     this.kinecticEnergyChange + this.potentialEnergyChange;

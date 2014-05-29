@@ -62,32 +62,7 @@ db.once('open', function(callback) {
   DataPoint = mongoose.model('datapoints', DataPointModel, 'datapoints');
 
   databaseQueries.getDataPoints = function(range, callback) {
-      var topLeft     = [range.left,range.top];
-      var bottomRight = [range.right,range.bottom];
-      var topRight    = [range.right,range.top];
-      var bottomLeft  = [range.left,range.bottom];
 
-      DataPoint.find({ 
-          geo: {
-              $geoWithin : {
-                  $geometry: {
-                      type: "Polygon",
-                      coordinates: [
-                        [
-                          topLeft,
-                          topRight,
-                          bottomRight,
-                          bottomLeft,
-                          topLeft
-                        ]
-                      ]
-                  }
-              }
-          }
-      }, function(err, results) {
-        if (err) console.log(err);
-        callback(results);
-      });
 
 
     // var bounds = {
