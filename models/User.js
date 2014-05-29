@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
 
 // create user schema
 var userSchema = mongoose.Schema({
+<<<<<<< HEAD:models.js/User.js
     _id: mongoose.Schema.Types.ObjectId,
     firstName: {type:String, default: ""},
     lastName: {type:String, default: ""},
@@ -12,6 +13,16 @@ var userSchema = mongoose.Schema({
     cost: Number,
     dieselEnergy: Number,
     electricEnergy: Number
+=======
+    firstName: {type:String, default: ""},
+    lastName: {type:String, default: ""},
+    distance: {type: Number, default: 0},
+    cost: {type: Number, default: 0},
+    dieselEnergy: {type: Number, default: 0},
+    electricalEnergy: {type: Number, default: 0},
+    kinecticEnergy: {type: Number, default: 0},
+    potentialEnergy: {type: Number, default: 0}
+>>>>>>> master:models/User.js
 });
 
 // define custom methods
@@ -26,13 +37,34 @@ userSchema.methods.calculate = function(callback) {
 };
 
 /**
+ * Calculates the total MPGe given the current
+ * energy changes
+ */
+userSchema.methods.getMPGe = function () {
+    var totalEnergyChange = this.dieselEnergy + this.electricalEnergy +
+    this.kinecticEnergy + this.potentialEnergy;
+    var MPGe = - (this.distance/1000 * 0.621) / (totalEnergyChange / 1000 / 37.72);
+    return MPGe;
+}
+
+/**
  * Creates a new trip linked to the user
  * @param object params
  * @param Closure callback
  */
 userSchema.methods.newTrip = function(params, callback) {
     params.userId = this._id;
-    (new Trip(params)).save(callback);
+    var trip = new Trip(params);
+    trip.save(function() {
+        callback(trip);
+    });
+}
+
+// Gets all trips for that user
+userSchema.methods.getTrips = function(callback) {
+    Trip.find({userId : this._id}, function(err, trips) {
+        callback(trips);
+    });
 }
 
 // cascade delete and calculate
