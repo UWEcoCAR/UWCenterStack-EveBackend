@@ -16,8 +16,8 @@ var toColor = { // purple
  *
  */
 var MapManager = function (currentLocation, width, height) {
-    this.WIDTH = 800;
-    this.HEIGHT = 800;
+    this.WIDTH = 700;
+    this.HEIGHT = 300;
     this.location = currentLocation;
     this.MAP_ID = "MapManager-map";
     this.CANVAS_ID = "MapManager-canvas";
