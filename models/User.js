@@ -4,16 +4,6 @@ var mongoose = require('mongoose'),
 
 // create user schema
 var userSchema = mongoose.Schema({
-<<<<<<< HEAD:models.js/User.js
-    _id: mongoose.Schema.Types.ObjectId,
-    firstName: {type:String, default: ""},
-    lastName: {type:String, default: ""},
-    distance: Number,
-    MPGe: Number,
-    cost: Number,
-    dieselEnergy: Number,
-    electricEnergy: Number
-=======
     firstName: {type:String, default: ""},
     lastName: {type:String, default: ""},
     distance: {type: Number, default: 0},
@@ -22,7 +12,6 @@ var userSchema = mongoose.Schema({
     electricalEnergy: {type: Number, default: 0},
     kinecticEnergy: {type: Number, default: 0},
     potentialEnergy: {type: Number, default: 0}
->>>>>>> master:models/User.js
 });
 
 // define custom methods

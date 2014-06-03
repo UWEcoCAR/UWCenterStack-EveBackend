@@ -15,10 +15,11 @@ var toColor = { // purple
  *
  *
  */
-var MapManager = function (currentLocation, width, height) {
-    this.WIDTH = 700;
-    this.HEIGHT = 300;
-    this.location = currentLocation;
+var MapManager = function(obj) {
+    // this.WIDTH = 700;
+    // this.HEIGHT = 300;
+    $.extend(this, obj);
+    //this.location = currentLocation;
     this.MAP_ID = "MapManager-map";
     this.CANVAS_ID = "MapManager-canvas";
     this.reqEfficiency = false;
@@ -49,9 +50,9 @@ var MapManager = function (currentLocation, width, height) {
 
         this.directionsDisplay = new google.maps.DirectionsRenderer();
         // TODO query for current location, return map around that location
-        var seattle = new google.maps.LatLng(47.6097, -122.3331);
+        var seattle = new google.maps.LatLng(this.LAT, this.LNG);
         var mapOptions = {
-            zoom: 6,
+            zoom: 15,
             center: seattle,
             mapTypeControlOptions: {
                 mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'usroadatlas']
@@ -190,7 +191,7 @@ var MapManager = function (currentLocation, width, height) {
         var width = Math.abs(left - right);
         var canvasWidth = me.canvas.get(0).width;
         var canvasHeight = me.canvas.get(0).height;
-
+        console.log(top, bottom, left, right);
         $.ajax({
             url: "/getDataPoints",
             type: 'GET',

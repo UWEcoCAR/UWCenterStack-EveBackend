@@ -1,6 +1,11 @@
 var mapManager;
 $(window).load(function() {
-  mapManager = new MapManager(400, 400);
+  mapManager = new MapManager({
+    LAT: 47.654109,
+    LNG: -122.304331,
+    HEIGHT: 300,
+    WIDTH: 700
+  });
   $('#mapAndCanvasContainer').append(mapManager.getMap());
   console.log("added");
 });

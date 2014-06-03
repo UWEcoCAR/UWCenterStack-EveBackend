@@ -7,13 +7,14 @@ var http = require("http"),
 var express = require("express");
 var app = express();
 var mongoose = require('mongoose');
-var UserModel = require("./models.js/User.js"),
-    TripModel = require('./models.js/Trip.js'),
-    DataPointModel = require('./models.js/DataPoint.js');
+var UserModel = require('./models/User.js'),
+    TripModel = require('./models/Trip.js'),
+    DataPointModel = require('./models/DataPoint.js');
 
 app.get("/getDataPoints", function(req, res) {
   console.log('getDataPoints: ' + JSON.stringify(req.query));
   databaseQueries.getDataPoints(req.query, function(data) {
+    console.log(data);
     var efficiencyAndLocation = [];
     // for (var i = 0; i < data.length; i++) {
     //   efficiencyAndLocation.push({
@@ -58,25 +59,41 @@ db.once('open', function(callback) {
   console.log("database ready");
 
   //User = mongoose.model('User', UserModel, 'User');
-  Trip = mongoose.model('trips', TripModel, 'trips');
+  //Trip = mongoose.model('trip', TripModel, 'trip');
   DataPoint = mongoose.model('datapoints', DataPointModel, 'datapoints');
 
   databaseQueries.getDataPoints = function(range, callback) {
 
+var topLeft     = [range.left,range.top];
+var bottomRight = [range.right,range.bottom];
+var topRight    = [range.right,range.top];
+var bottomLeft  = [range.left,range.bottom];
 
+DataPoint.find({
+    geo: {
+        $geoWithin : {
+            $geometry: {
+                type: "Polygon",
+                coordinates: [
+                  [
+                    topLeft,
+                    topRight,
+                    bottomRight,
+                    bottomLeft,
+                    topLeft // close off the polygon
+                  ]
+                ]
+            }
+        }
+    }
+}, function(err, results) {
+  if (err) console.log(err);
+  for (var i = 0; i < results.length; i++) {
+    results[i].efficiecy = 10;
+  }
 
-    // var bounds = {
-    //   type: "Feature",
-    //   geometry : {
-    //     type: "Polygon",
-    //     coordinates: [
-    //       [
-    //         range.topLeft, range.topRight, range.bottomRight, range.bottomLeft
-    //       ]
-    //     ]
-    //   }
-    // }
-    // return DataPoint.find({geo: { $geoWithin: bounds }}, callback);
+  callback(results);
+});
     /*
     return DataPoint.find()
       .where('location.lat').gte(range.bottom).lte(range.top)
