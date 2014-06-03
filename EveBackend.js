@@ -74,10 +74,7 @@ module.exports.EveBackend = function(canReadWriter, username, eventEmitter, call
         PE = potentialEnergy(canReadWriter.getMail('elevation'), prevElevation);
         speed = canReadWriter.getMail('vehicleSpeed');
         trip.newPoint({
-          location: {
-            lat: canReadWriter.getMail('gpsLatitude'),
-            long: canReadWriter.getMail('gpsLongitude')
-          },
+          geo: [canReadWriter.getMail('gpsLatitude'), canReadWriter.getMail('gpsLongitude')],
           pedalPosition: canReadWriter.getMail('vehicleAccel'),
           speed: canReadWriter.getMail('vehicleSpeed'),
           engineTrq: canReadWriter.getMail('engineTorque'),

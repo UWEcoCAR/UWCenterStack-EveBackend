@@ -6,11 +6,11 @@ var tripSchema = mongoose.Schema({
     userId: mongoose.Schema.Types.ObjectId,
     startLocation: {
         time: {type: Date, default: Date.now},
-        location: {lat: Number, long: Number}
+        geo: {type: [Number], index: '2d'}
     },
     endLocation: {
         time: Date,
-        location: {lat: Number, long: Number}
+        geo: {type: [Number], index: '2d'}
     },
     distance: {type: Number, default: 0},
     cost: Number,
