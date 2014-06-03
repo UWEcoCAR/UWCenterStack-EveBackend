@@ -154,7 +154,7 @@ module.exports.EveBackend.prototype.getDataPointsInRange = function(range, callb
   var topRight    = [range.right,range.top];
   var bottomLeft  = [range.left,range.bottom];
 
-  DataPoint.find({ 
+  DataPoint.find({
       geo: {
           $geoWithin : {
               $geometry: {

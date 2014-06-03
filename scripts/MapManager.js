@@ -13,12 +13,21 @@ var toColor = { // purple
   blue: 145
 };
  *
- *
+
+Options should be an object containing:
+
+{
+  LAT: 47.654109,    // current latitude
+  LNG: -122.304331,  // current longitude
+  HEIGHT: 300,       // height of the map
+  WIDTH: 700         // width of the map
+}
+
  */
-var MapManager = function(obj) {
+var MapManager = function(options) {
     // this.WIDTH = 700;
     // this.HEIGHT = 300;
-    $.extend(this, obj);
+    $.extend(this, options);
     //this.location = currentLocation;
     this.MAP_ID = "MapManager-map";
     this.CANVAS_ID = "MapManager-canvas";
