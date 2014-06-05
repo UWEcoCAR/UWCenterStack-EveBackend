@@ -1,6 +1,6 @@
 {
   "name": "uwcenterstack-evebackend",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "main": "./EveBackend.js",
   "repository": {
     "type": "git",

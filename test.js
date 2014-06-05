@@ -11,7 +11,7 @@ var efficiencyEventEmitter = new events.EventEmitter();
  * Events are MPGe scores for every datapoint
  */
 eventEmitter.on('MPGe', function(MPGe) {
-    // console.log(MPGe);
+    //console.log(MPGe);
 });
 
 /**

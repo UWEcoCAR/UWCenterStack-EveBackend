@@ -1,6 +1,7 @@
 var _ = require('underscore');
 var util = require('util');
 var events = require('events');
+var loc = require('./elevation/ElevationService');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/evebackend-' + (process.NODE_ENV === 'production' ? 'prod' : 'dev'));
 
@@ -22,12 +23,12 @@ var kinecticEnergy = function(speed, prevSpeed) {
 }
 
 var potentialEnergy = function(elevation, prevElevation) {
-  return 2025 * 9.81 * (elevation - prevElevation) * 2.78 / 10000;
+  return 2054 * 9.81 * (elevation - prevElevation) * 2.78 / 10000;
 }
 
 // initialize these to first datapoint
 var prevSpeed = 0;
-var prevElevation = 0;
+var prevElevation = null;
 
 // Local variables to save data to update Trip every time
 var DE = 0;
@@ -53,6 +54,26 @@ module.exports.EveBackend = function(canReadWriter, username, eventEmitter, call
   // Finds or makes a User
   var name = username.split(" ");
   var self = this;
+
+  // Set elevation
+  this.elevation = null;
+  try {
+    var quadrant = new loc.Quadrant({
+      filename: './elevation/data/N42W084.hgt'
+    });
+      canReadWriter.on('gpsLatitude', function() {
+      quadrant.read(canReadWriter.getMail('gpsLatitude'), canReadWriter.getMail('gpsLongitude'), function(err, height) {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        self.elevation = height;
+      });
+    });
+  } catch (err) {
+    console.err(err);
+  }
+
   // Finds or makes a User
   User.findOne({firstName: name[0], lastName: name[1]}, function(err,user) {
     if (user == null) {
@@ -71,7 +92,7 @@ module.exports.EveBackend = function(canReadWriter, username, eventEmitter, call
         DE = dieselEnergy(canReadWriter.getMail('fuelConsumption'));
         EE = electricalEnergy(canReadWriter.getMail('batteryVoltage'), canReadWriter.getMail('batteryCurrent'));
         KE = kinecticEnergy(canReadWriter.getMail('vehicleSpeed'), prevSpeed);
-        PE = potentialEnergy(canReadWriter.getMail('elevation'), prevElevation);
+        PE = self.elevation !== null && prevElevation != null ? potentialEnergy(self.elevation, prevElevation) : 0;
         speed = canReadWriter.getMail('vehicleSpeed');
         trip.newPoint({
           geo: [canReadWriter.getMail('gpsLatitude'), canReadWriter.getMail('gpsLongitude')],
@@ -88,18 +109,19 @@ module.exports.EveBackend = function(canReadWriter, username, eventEmitter, call
           batteryCurrent: canReadWriter.getMail('batteryCurrent'),
           batteryTemp: canReadWriter.getMail('batteryTemp'),
           fuelConsumption: canReadWriter.getMail('fuelConsumption'),
-          elevation: canReadWriter.getMail('elevation'),
+          elevation: self.elevation,
           dieselEnergyChange: dieselEnergy(canReadWriter.getMail('fuelConsumption')),
           electricalEnergyChange: electricalEnergy(canReadWriter.getMail('batteryVoltage'), canReadWriter.getMail('batteryCurrent')),
           kinecticEnergyChange: kinecticEnergy(canReadWriter.getMail('vehicleSpeed'), prevSpeed),
-          potentialEnergyChange: potentialEnergy(canReadWriter.getMail('elevation'), prevElevation)
+          potentialEnergyChange: self.elevation !== null && prevElevation != null ? potentialEnergy(self.elevation, prevElevation) : 0
         }, // dataPoint to manipulate or call methods on
           function(dataPoint) {
           eventEmitter.emit('MPGe', dataPoint.calcMPGe());
           eventEmitter.emit('vehichleEfficiencyScore', dataPoint.vehicleEfficiencyScore);
-          prevElevation = dataPoint.elevation;
-          prevSpeed = dataPoint.speed;
         });
+        prevElevation = self.elevation;
+        prevSpeed = canReadWriter.getMail('vehicleSpeed');
+
         // Updates trip
         trip.distance += speed * 0.1;
         trip.dieselEnergy += DE;
