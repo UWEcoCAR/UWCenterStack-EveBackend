@@ -9,8 +9,8 @@ var events = require('events');
  */
 
 var TestCanEmitter = module.exports = function() {
-    this.gpsLatitude = 42.583;
-    this.gpsLongitude = -83.680;
+    this.gpsLatitude = 42.5952618;
+    this.gpsLongitude = -83.6836065;
 
     this.accelPressed = false;
     this.brakePressed = false;
@@ -109,8 +109,8 @@ var TestCanEmitter = module.exports = function() {
         this.emit('chargerCurrent', this.chargerCurrent);
         this.emit('gpsLatitude', this.gpsLatitude);
         this.emit('gpsLongitude', this.gpsLongitude);
-        this.gpsLatitude += randomAroundZero/1000;
-        this.gpsLongitude += randomAroundZero/1000;
+        this.gpsLatitude += randomAroundZero/5000;
+        this.gpsLongitude += randomAroundZero/5000;
     }, this), 100);
 };
 util.inherits(TestCanEmitter, events.EventEmitter);
